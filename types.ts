@@ -86,6 +86,6 @@ export interface UserProfile {
     avatar: AvatarItem;
 }
 
-export type Theme = 'ocean' | 'sunset' | 'nature' | 'nebula';
+export type Theme = 'ocean' | 'sunset' | 'nature' | 'nebula' | 'midnight' | 'cherry' | 'coffee' | 'glacier';
 
 export type DateRange = '1W' | '1M' | '3M' | '6M' | '1Y' | 'ALL';

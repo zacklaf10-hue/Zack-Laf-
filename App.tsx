@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Transaction, TransactionType, Category, Debt, Theme, GroupEvent, UserProfile, AvatarItem } from './types';
 import { INITIAL_TRANSACTIONS } from './constants';
@@ -8,29 +9,34 @@ import AIAdvisor from './components/AIAdvisor';
 import FriendsFamily from './components/FriendsFamily';
 import GroupEvents from './components/GroupEvents';
 import { hasSharedKey } from './services/geminiService';
-import { Wallet, Users, X, Sun, Moon, Palette, Plane, Download, Share, Settings, Trash2, ArrowRight, Sparkles, CheckCircle, Lock } from 'lucide-react';
+import { Wallet, Users, X, Sun, Moon, Palette, Plane, Download, Share, Settings, Trash2, ArrowRight, Sparkles, CheckCircle, Lock, Plus } from 'lucide-react';
 
 // Added primary hex for direct coloring
 const THEMES: Record<Theme, { b1: string, b2: string, b3: string, primary: string }> = {
   ocean: { b1: '#4f46e5', b2: '#0891b2', b3: '#2563eb', primary: '#4f46e5' }, 
   sunset: { b1: '#db2777', b2: '#f59e0b', b3: '#ea580c', primary: '#db2777' }, 
   nature: { b1: '#059669', b2: '#65a30d', b3: '#10b981', primary: '#10b981' }, 
-  nebula: { b1: '#7c3aed', b2: '#c026d3', b3: '#4f46e5', primary: '#7c3aed' }, 
+  nebula: { b1: '#7c3aed', b2: '#c026d3', b3: '#4f46e5', primary: '#7c3aed' },
+  midnight: { b1: '#334155', b2: '#0f172a', b3: '#64748b', primary: '#64748b' },
+  cherry: { b1: '#be123c', b2: '#9f1239', b3: '#e11d48', primary: '#e11d48' },
+  coffee: { b1: '#78350f', b2: '#92400e', b3: '#b45309', primary: '#d97706' },
+  glacier: { b1: '#0ea5e9', b2: '#38bdf8', b3: '#7dd3fc', primary: '#0ea5e9' },
 };
 
+// Unified style: Notionists (Clean, aesthetic, finance-friendly)
 const AVATARS: AvatarItem[] = [
-    { name: 'Alex', style: 'avataaars', seed: 'Alex' },
-    { name: 'Sophie', style: 'avataaars', seed: 'Sophie' },
-    { name: 'Max', style: 'avataaars', seed: 'Max' },
-    { name: 'Bot', style: 'bottts', seed: 'Robot' },
-    { name: 'Alien', style: 'bottts', seed: 'Caleb' },
-    { name: 'Cool', style: 'avataaars', seed: 'Cool' },
-    { name: 'Smile', style: 'fun-emoji', seed: 'Smile' },
-    { name: 'Wink', style: 'fun-emoji', seed: 'Wink' },
-    { name: 'Artist', style: 'micah', seed: 'Artist' },
-    { name: 'Explorer', style: 'adventurer', seed: 'Explorer' },
-    { name: 'Hipster', style: 'notionists', seed: 'Hipster' },
-    { name: 'Sketch', style: 'micah', seed: 'Sketch' },
+    { name: 'The CEO', style: 'notionists', seed: 'Felix' },
+    { name: 'Budget Boss', style: 'notionists', seed: 'Molly' },
+    { name: 'Crypto King', style: 'notionists', seed: 'Bear' },
+    { name: 'HODLer', style: 'notionists', seed: 'Aneka' },
+    { name: 'Tax Wizard', style: 'notionists', seed: 'Liam' },
+    { name: 'The Wolf', style: 'notionists', seed: 'Wolf' },
+    { name: 'Penny Pincher', style: 'notionists', seed: 'Penny' },
+    { name: 'Stonks Guy', style: 'notionists', seed: 'Ryan' },
+    { name: 'Digital Nomad', style: 'notionists', seed: 'Sarah' },
+    { name: 'Venture Cap', style: 'notionists', seed: 'Jon' },
+    { name: 'Cash Flow', style: 'notionists', seed: 'Flow' },
+    { name: 'Dividends', style: 'notionists', seed: 'Divi' },
 ];
 
 // --- ONBOARDING COMPONENT ---
@@ -335,7 +341,7 @@ const App: React.FC = () => {
                       </button>
                       
                       {showThemePicker && (
-                        <div className="absolute top-12 right-0 glass-panel p-2 rounded-2xl flex flex-col gap-2 min-w-[120px] shadow-2xl animate-fade-in z-50">
+                        <div className="absolute top-12 right-0 glass-panel p-2 rounded-2xl flex flex-col gap-2 min-w-[140px] shadow-2xl animate-fade-in z-50">
                           {Object.keys(THEMES).map((t) => (
                             <button
                               key={t}
@@ -343,7 +349,7 @@ const App: React.FC = () => {
                               className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-sm capitalize text-left dark:text-white text-gray-800"
                             >
                               <div 
-                                className="w-4 h-4 rounded-full" 
+                                className="w-4 h-4 rounded-full border border-white/20" 
                                 style={{ background: THEMES[t as Theme].primary }}
                               ></div>
                               {t}
@@ -375,7 +381,7 @@ const App: React.FC = () => {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
         
         {currentView === 'personal' && (
-            <div className="space-y-8">
+            <div className="space-y-8 relative">
                 <Dashboard 
                   transactions={transactions} 
                   privacyMode={privacyMode} 
@@ -395,6 +401,15 @@ const App: React.FC = () => {
                         />
                     </div>
                 </div>
+
+                {/* Floating Add Button for Main View */}
+                <button 
+                    onClick={() => setShowQuickAdd(true)}
+                    className="fixed bottom-24 right-6 w-14 h-14 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-40 lg:hidden"
+                    style={{ backgroundColor: 'var(--theme-color)' }}
+                >
+                    <Plus size={24} />
+                </button>
             </div>
         )}
 
