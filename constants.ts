@@ -1,3 +1,4 @@
+
 import { Category, Merchant, Transaction, TransactionType } from './types';
 
 export const FRENCH_MERCHANTS: Merchant[] = [
@@ -50,49 +51,8 @@ export const FRENCH_MERCHANTS: Merchant[] = [
   { id: 'm36', name: 'La Poste', defaultCategory: Category.OTHER },
 ];
 
-export const INITIAL_TRANSACTIONS: Transaction[] = [
-  {
-    id: 't1',
-    amount: 1500,
-    type: TransactionType.INCOME,
-    category: Category.SALARY,
-    merchantName: 'Employeur',
-    date: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
-  },
-  {
-    id: 't2',
-    amount: 85.50,
-    type: TransactionType.EXPENSE,
-    category: Category.GROCERIES,
-    merchantName: 'Carrefour',
-    date: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
-  },
-  {
-    id: 't3',
-    amount: 75.00,
-    type: TransactionType.EXPENSE,
-    category: Category.TRANSPORT,
-    merchantName: 'RATP',
-    date: new Date(Date.now() - 86400000 * 10).toISOString(), // 10 days ago
-    notes: 'Navigo Monthly'
-  },
-  {
-    id: 't4',
-    amount: 29.99,
-    type: TransactionType.EXPENSE,
-    category: Category.UTILITIES,
-    merchantName: 'Free',
-    date: new Date(Date.now() - 86400000 * 15).toISOString(),
-  },
-  {
-    id: 't5',
-    amount: 45.00,
-    type: TransactionType.EXPENSE,
-    category: Category.RESTAURANT,
-    merchantName: 'Bistrot Parisien',
-    date: new Date().toISOString(),
-  }
-];
+// START AS NEW APP - NO DATA
+export const INITIAL_TRANSACTIONS: Transaction[] = [];
 
 export const CATEGORY_COLORS: Record<Category, string> = {
   [Category.GROCERIES]: '#10b981', // emerald-500

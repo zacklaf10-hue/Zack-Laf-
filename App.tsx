@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Transaction, TransactionType, Category, Debt, Theme, GroupEvent } from './types';
+import { Transaction, TransactionType, Category, Debt, Theme, GroupEvent, UserProfile, AvatarItem } from './types';
 import { INITIAL_TRANSACTIONS } from './constants';
 import Dashboard from './components/Dashboard';
 import AddTransaction from './components/AddTransaction';
@@ -8,7 +8,7 @@ import TransactionList from './components/TransactionList';
 import AIAdvisor from './components/AIAdvisor';
 import FriendsFamily from './components/FriendsFamily';
 import GroupEvents from './components/GroupEvents';
-import { Wallet, Users, X, Sun, Moon, Palette, Plane, Download, Share } from 'lucide-react';
+import { Wallet, Users, X, Sun, Moon, Palette, Plane, Download, Share, Settings, Trash2, ArrowRight } from 'lucide-react';
 
 // Added primary hex for direct coloring
 const THEMES: Record<Theme, { b1: string, b2: string, b3: string, primary: string }> = {
@@ -18,7 +18,7 @@ const THEMES: Record<Theme, { b1: string, b2: string, b3: string, primary: strin
   nebula: { b1: '#7c3aed', b2: '#c026d3', b3: '#4f46e5', primary: '#7c3aed' }, 
 };
 
-const AVATARS = [
+const AVATARS: AvatarItem[] = [
     { name: 'Alex', style: 'avataaars', seed: 'Alex' },
     { name: 'Sophie', style: 'avataaars', seed: 'Sophie' },
     { name: 'Max', style: 'avataaars', seed: 'Max' },
@@ -33,12 +33,113 @@ const AVATARS = [
     { name: 'Sketch', style: 'micah', seed: 'Sketch' },
 ];
 
+// --- ONBOARDING COMPONENT ---
+const Onboarding: React.FC<{ onComplete: (profile: UserProfile) => void }> = ({ onComplete }) => {
+    const [step, setStep] = useState<'splash' | 'setup'>('splash');
+    const [name, setName] = useState('Zack'); // Default suggestion
+    const [selectedAvatar, setSelectedAvatar] = useState<AvatarItem>(AVATARS[0]);
+    const [opacity, setOpacity] = useState(0);
+
+    // Splash Animation Timer
+    useEffect(() => {
+        // Fade in logo
+        setTimeout(() => setOpacity(1), 100);
+        
+        // Move to setup after 2.5s
+        const timer = setTimeout(() => {
+            setStep('setup');
+        }, 2500);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if(name.trim()) {
+            onComplete({ name, avatar: selectedAvatar });
+        }
+    };
+
+    if (step === 'splash') {
+        return (
+            <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black transition-opacity duration-1000" style={{ opacity: 1 }}>
+                <div className="flex flex-col items-center gap-6" style={{ opacity, transition: 'opacity 1s ease' }}>
+                    <div 
+                        className="w-24 h-24 rounded-3xl flex items-center justify-center text-white font-extrabold text-5xl shadow-2xl animate-splash-bounce"
+                        style={{ backgroundColor: '#4f46e5', boxShadow: '0 0 40px rgba(79, 70, 229, 0.6)' }}
+                    >
+                        Z
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+             <div className="glass-panel w-full max-w-md rounded-3xl p-8 animate-slide-up relative">
+                <div className="text-center mb-8">
+                     <div 
+                        className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-2xl shadow-xl"
+                        style={{ backgroundColor: '#4f46e5' }}
+                    >
+                        Z
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Welcome to Z-Finance</h2>
+                    <p className="text-white/60">Let's set up your profile.</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="text-xs font-bold uppercase text-white/50 mb-2 block">Your Name</label>
+                        <input 
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full bg-white/10 border border-white/10 rounded-2xl p-4 text-white text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
+                            placeholder="Enter your name"
+                            autoFocus
+                        />
+                    </div>
+
+                    <div>
+                         <label className="text-xs font-bold uppercase text-white/50 mb-3 block">Choose Avatar</label>
+                         <div className="grid grid-cols-4 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                            {AVATARS.map(av => (
+                                <button
+                                    type="button"
+                                    key={av.seed}
+                                    onClick={() => setSelectedAvatar(av)}
+                                    className={`relative rounded-xl p-1 transition-all ${selectedAvatar.seed === av.seed ? 'bg-white/20 ring-2 ring-white scale-105' : 'hover:bg-white/5'}`}
+                                >
+                                     <img 
+                                        src={`https://api.dicebear.com/7.x/${av.style}/svg?seed=${av.seed}&backgroundColor=transparent`} 
+                                        alt={av.name} 
+                                        className="w-full aspect-square"
+                                    />
+                                </button>
+                            ))}
+                         </div>
+                    </div>
+
+                    <button 
+                        type="submit"
+                        className="w-full py-4 rounded-2xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        style={{ backgroundColor: '#4f46e5' }}
+                    >
+                        Start Journey <ArrowRight size={20}/>
+                    </button>
+                </form>
+             </div>
+        </div>
+    );
+};
+
+// --- MAIN APP ---
 const App: React.FC = () => {
   // State: Preferences
   const [privacyMode, setPrivacyMode] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<Theme>('ocean');
-  const [avatar, setAvatar] = useState(AVATARS[0]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
   // State: Views
   const [currentView, setCurrentView] = useState<'personal' | 'friends' | 'events'>('personal');
@@ -46,35 +147,24 @@ const App: React.FC = () => {
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // State: Transactions
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     const saved = localStorage.getItem('lumiere_transactions');
-    try {
-      return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
-    } catch {
-      return INITIAL_TRANSACTIONS;
-    }
+    try { return saved ? JSON.parse(saved) : []; } catch { return []; }
   });
 
   // State: Debts
   const [debts, setDebts] = useState<Debt[]>(() => {
     const saved = localStorage.getItem('lumiere_debts');
-    try {
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    try { return saved ? JSON.parse(saved) : []; } catch { return []; }
   });
 
   // State: Group Events
   const [events, setEvents] = useState<GroupEvent[]>(() => {
       const saved = localStorage.getItem('lumiere_events');
-      try {
-          return saved ? JSON.parse(saved) : [];
-      } catch {
-          return [];
-      }
+      try { return saved ? JSON.parse(saved) : []; } catch { return []; }
   });
 
   // Persistence
@@ -82,9 +172,25 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('lumiere_debts', JSON.stringify(debts)); }, [debts]);
   useEffect(() => { localStorage.setItem('lumiere_events', JSON.stringify(events)); }, [events]);
 
+  // Load User Profile
+  useEffect(() => {
+      const savedProfile = localStorage.getItem('zfinance_user');
+      if (savedProfile) {
+          try {
+            setUserProfile(JSON.parse(savedProfile));
+          } catch(e) {
+              console.error("Profile parse error");
+          }
+      }
+  }, []);
+
+  const handleOnboardingComplete = (profile: UserProfile) => {
+      setUserProfile(profile);
+      localStorage.setItem('zfinance_user', JSON.stringify(profile));
+  };
+
   // Theme & Dark Mode Effects
   useEffect(() => {
-    // Update CSS variables for blobs AND primary theme color
     const root = document.documentElement;
     const colors = THEMES[currentTheme];
     root.style.setProperty('--blob-1', colors.b1);
@@ -129,6 +235,34 @@ const App: React.FC = () => {
   const updateEvent = (updatedEvent: GroupEvent) => setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
   const deleteEvent = (id: string) => setEvents(prev => prev.filter(e => e.id !== id));
 
+  // Reset App Data
+  const handleResetApp = () => {
+      if(window.confirm("⚠️ Are you sure? This will delete ALL transactions, debts, events, AND your profile.")) {
+          setTransactions([]);
+          setDebts([]);
+          setEvents([]);
+          setUserProfile(null);
+          localStorage.removeItem('lumiere_transactions');
+          localStorage.removeItem('lumiere_debts');
+          localStorage.removeItem('lumiere_events');
+          localStorage.removeItem('zfinance_user');
+          setShowSettingsModal(false);
+      }
+  };
+
+  const updateAvatar = (newAvatar: AvatarItem) => {
+      if (userProfile) {
+          const updated = { ...userProfile, avatar: newAvatar };
+          setUserProfile(updated);
+          localStorage.setItem('zfinance_user', JSON.stringify(updated));
+      }
+  }
+
+  // RENDER ONBOARDING IF NO USER
+  if (!userProfile) {
+      return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
+
   return (
     <div className="min-h-screen pb-28 relative overflow-x-hidden transition-colors duration-500">
       
@@ -143,7 +277,7 @@ const App: React.FC = () => {
                     Z
                 </div>
                 <div>
-                    <h1 className="text-xl font-bold dark:text-white text-gray-900 tracking-tight leading-none">Z-Finance</h1>
+                    <h1 className="text-xl font-bold dark:text-white text-gray-900 tracking-tight leading-none">Hello, {userProfile.name}</h1>
                 </div>
             </div>
             
@@ -155,6 +289,15 @@ const App: React.FC = () => {
                     title="Install App"
                   >
                     <Download size={20} />
+                  </button>
+
+                  {/* Settings Button */}
+                  <button 
+                    onClick={() => setShowSettingsModal(true)}
+                    className="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-gray-700 dark:text-white"
+                    title="Settings & Reset"
+                  >
+                    <Settings size={20} />
                   </button>
 
                 {/* Theme & Mode Toggles */}
@@ -204,7 +347,7 @@ const App: React.FC = () => {
                 >
                     <div className="w-full h-full rounded-full bg-white dark:bg-black overflow-hidden">
                          <img 
-                            src={`https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}&backgroundColor=transparent`} 
+                            src={`https://api.dicebear.com/7.x/${userProfile.avatar.style}/svg?seed=${userProfile.avatar.seed}&backgroundColor=transparent`} 
                             alt="User" 
                             className="w-full h-full object-cover" 
                         />
@@ -283,7 +426,32 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Avatar Picker Modal */}
+      {/* Settings Modal */}
+      {showSettingsModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="glass-panel w-full max-w-sm rounded-3xl p-6 animate-zoom-in relative">
+                  <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-bold dark:text-white text-gray-900">Settings</h3>
+                      <button onClick={() => setShowSettingsModal(false)} className="p-2 rounded-full hover:bg-white/10 text-gray-500 dark:text-white/50"><X size={20} /></button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                      <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                          <h4 className="font-bold dark:text-white text-gray-900 mb-1">Data Management</h4>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Clear all data and profile. Resets to "fresh install".</p>
+                          <button 
+                            onClick={handleResetApp}
+                            className="w-full py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold transition-colors flex items-center justify-center gap-2"
+                          >
+                              <Trash2 size={18} /> Reset Everything
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      )}
+
+      {/* Avatar Picker Modal (Main App) */}
       {showAvatarPicker && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
               <div className="glass-panel w-full max-w-md rounded-3xl p-6 animate-zoom-in relative max-h-[80vh] overflow-y-auto custom-scrollbar">
@@ -295,8 +463,8 @@ const App: React.FC = () => {
                       {AVATARS.map((av) => (
                           <button 
                             key={av.name + av.seed}
-                            onClick={() => { setAvatar(av); setShowAvatarPicker(false); }}
-                            className={`relative rounded-2xl p-2 transition-all hover:scale-105 flex flex-col items-center ${avatar.seed === av.seed ? 'bg-white/20 ring-2 ring-white' : 'hover:bg-white/5'}`}
+                            onClick={() => { updateAvatar(av); setShowAvatarPicker(false); }}
+                            className={`relative rounded-2xl p-2 transition-all hover:scale-105 flex flex-col items-center ${userProfile?.avatar.seed === av.seed ? 'bg-white/20 ring-2 ring-white' : 'hover:bg-white/5'}`}
                           >
                                 <img 
                                     src={`https://api.dicebear.com/7.x/${av.style}/svg?seed=${av.seed}&backgroundColor=transparent`} 

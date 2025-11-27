@@ -75,6 +75,17 @@ export interface GroupEvent {
     currency?: string; // e.g. 'EUR', 'MAD', 'USD'
 }
 
+export interface AvatarItem {
+    name: string;
+    style: string;
+    seed: string;
+}
+
+export interface UserProfile {
+    name: string;
+    avatar: AvatarItem;
+}
+
 export type Theme = 'ocean' | 'sunset' | 'nature' | 'nebula';
 
 export type DateRange = '1W' | '1M' | '3M' | '6M' | '1Y' | 'ALL';

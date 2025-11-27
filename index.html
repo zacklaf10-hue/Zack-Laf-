@@ -2,11 +2,11 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Z-Finance">
-    <meta name="theme-color" content="#050505">
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://api.dicebear.com/9.x/initials/png?seed=Z&backgroundColor=4f46e5">
     
@@ -32,6 +32,8 @@
               'blob': 'blob 10s infinite',
               'fade-in': 'fadeIn 0.5s ease-out forwards',
               'zoom-in': 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'splash-bounce': 'splashBounce 2s infinite',
+              'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             },
             keyframes: {
               blob: {
@@ -47,6 +49,14 @@
               zoomIn: {
                 '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
                 '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }
+              },
+              splashBounce: {
+                '0%, 100%': { transform: 'scale(1)', filter: 'brightness(1)' },
+                '50%': { transform: 'scale(1.05)', filter: 'brightness(1.2)' }
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(40px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' }
               }
             }
           }
