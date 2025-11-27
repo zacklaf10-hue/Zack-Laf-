@@ -2,8 +2,9 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Transaction, FinancialInsight } from '../types';
 
 // Initialize Gemini
-// Ensure process.env.API_KEY is available in your environment
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safely access process.env to prevent "process is not defined" crashes in browser environments (like Netlify)
+const apiKey = typeof process !== "undefined" ? process.env.API_KEY : "";
+const ai = new GoogleGenAI({ apiKey });
 
 export const getFinancialInsights = async (transactions: Transaction[]): Promise<FinancialInsight> => {
   try {
