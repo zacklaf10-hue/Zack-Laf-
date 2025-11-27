@@ -2,11 +2,32 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Transaction, FinancialInsight } from '../types';
 
 // Initialize Gemini
-// Safely access process.env to prevent "process is not defined" crashes in browser environments (like Netlify)
-const apiKey = typeof process !== "undefined" ? process.env.API_KEY : "";
+// Safely access environment variables to prevent crashes in browser environments
+const getApiKey = () => {
+  if (typeof process !== "undefined" && process.env) {
+    return process.env.API_KEY || process.env.GEMINI_API_KEY || "";
+  }
+  // Fallback for Vite/other bundlers if they expose env differently
+  // @ts-ignore
+  if (typeof import.meta !== "undefined" && import.meta.env) {
+    // @ts-ignore
+    return import.meta.env.VITE_API_KEY || import.meta.env.API_KEY || "";
+  }
+  return "";
+};
+
+const apiKey = getApiKey();
 const ai = new GoogleGenAI({ apiKey });
 
 export const getFinancialInsights = async (transactions: Transaction[]): Promise<FinancialInsight> => {
+  if (!apiKey) {
+    return {
+      title: "AI Not Configured",
+      content: "Please add your Google Gemini API Key to the settings to enable AI insights.",
+      tone: "neutral"
+    };
+  }
+
   try {
     const recentTransactions = transactions.slice(0, 20); // Analyze last 20 for brevity
     const transactionSummary = JSON.stringify(recentTransactions.map(t => ({
@@ -60,6 +81,8 @@ export const getFinancialInsights = async (transactions: Transaction[]): Promise
 
 
 export const predictCategory = async (merchantName: string, amount: number): Promise<string | null> => {
+    if (!apiKey) return null;
+
     try {
         const prompt = `Classify this expense for a merchant named "${merchantName}" with amount ${amount} EUR. 
         Choose one category from this list: Groceries, Transport, Utilities, Shopping, Restaurant, Entertainment, Health, Housing, Other. 
