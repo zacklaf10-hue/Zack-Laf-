@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Transaction, TransactionType, Category, Debt, Theme, GroupEvent, UserProfile, AvatarItem } from './types';
 import { INITIAL_TRANSACTIONS } from './constants';
@@ -8,7 +7,8 @@ import TransactionList from './components/TransactionList';
 import AIAdvisor from './components/AIAdvisor';
 import FriendsFamily from './components/FriendsFamily';
 import GroupEvents from './components/GroupEvents';
-import { Wallet, Users, X, Sun, Moon, Palette, Plane, Download, Share, Settings, Trash2, ArrowRight } from 'lucide-react';
+import { hasSharedKey } from './services/geminiService';
+import { Wallet, Users, X, Sun, Moon, Palette, Plane, Download, Share, Settings, Trash2, ArrowRight, Sparkles, CheckCircle, Lock } from 'lucide-react';
 
 // Added primary hex for direct coloring
 const THEMES: Record<Theme, { b1: string, b2: string, b3: string, primary: string }> = {
@@ -140,6 +140,8 @@ const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<Theme>('ocean');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('zfinance_api_key') || '');
+  const [isSharedKey, setIsSharedKey] = useState(false);
   
   // State: Views
   const [currentView, setCurrentView] = useState<'personal' | 'friends' | 'events'>('personal');
@@ -171,6 +173,13 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('lumiere_transactions', JSON.stringify(transactions)); }, [transactions]);
   useEffect(() => { localStorage.setItem('lumiere_debts', JSON.stringify(debts)); }, [debts]);
   useEffect(() => { localStorage.setItem('lumiere_events', JSON.stringify(events)); }, [events]);
+
+  // Check for shared key on mount
+  useEffect(() => {
+      if (hasSharedKey()) {
+          setIsSharedKey(true);
+      }
+  }, []);
 
   // Load User Profile
   useEffect(() => {
@@ -246,8 +255,14 @@ const App: React.FC = () => {
           localStorage.removeItem('lumiere_debts');
           localStorage.removeItem('lumiere_events');
           localStorage.removeItem('zfinance_user');
+          localStorage.removeItem('zfinance_api_key');
           setShowSettingsModal(false);
       }
+  };
+
+  const handleSaveApiKey = () => {
+      localStorage.setItem('zfinance_api_key', apiKey);
+      alert("API Key Saved Successfully!");
   };
 
   const updateAvatar = (newAvatar: AvatarItem) => {
@@ -436,6 +451,44 @@ const App: React.FC = () => {
                   </div>
                   
                   <div className="space-y-4">
+                      {/* API Key Input */}
+                      <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                            <h4 className="font-bold dark:text-white text-gray-900 mb-2 flex items-center gap-2">
+                                <Sparkles size={16} className="text-fuchsia-500"/> AI Configuration
+                            </h4>
+                            
+                            {isSharedKey ? (
+                                <div className="flex items-center gap-2 p-3 bg-emerald-500/10 rounded-xl text-emerald-500 dark:text-emerald-400">
+                                    <CheckCircle size={16} />
+                                    <span className="text-sm font-semibold">Active (Shared Key)</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                                        Enter your Gemini API Key to enable insights & auto-categorization.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            type="password" 
+                                            value={apiKey}
+                                            onChange={(e) => setApiKey(e.target.value)}
+                                            className="flex-1 bg-white/50 dark:bg-black/20 border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+                                            placeholder="AIzaSy..."
+                                        />
+                                        <button 
+                                            onClick={handleSaveApiKey}
+                                            className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                    <div className="mt-2 text-[10px] text-gray-400">
+                                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline hover:text-fuchsia-500">Get a free key here</a>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                       <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
                           <h4 className="font-bold dark:text-white text-gray-900 mb-1">Data Management</h4>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Clear all data and profile. Resets to "fresh install".</p>
