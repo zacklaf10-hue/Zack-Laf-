@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Z-Finance">
+    <meta name="theme-color" content="#050505">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://api.dicebear.com/9.x/initials/png?seed=Z&backgroundColor=4f46e5">
+    
+    <title>Z-Finance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
+            },
+            colors: {
+              glass: {
+                100: 'rgba(255, 255, 255, 0.1)',
+                200: 'rgba(255, 255, 255, 0.2)',
+                300: 'rgba(255, 255, 255, 0.3)',
+                border: 'rgba(255, 255, 255, 0.15)',
+              }
+            },
+            animation: {
+              'blob': 'blob 10s infinite',
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+              'zoom-in': 'zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            },
+            keyframes: {
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              },
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' }
+              },
+              zoomIn: {
+                '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+                '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --blob-1: #4f46e5;
+        --blob-2: #db2777;
+        --blob-3: #0891b2;
+        --theme-color: #4f46e5; /* Default Primary Accent */
+      }
+
+      body {
+        font-family: 'Outfit', sans-serif;
+        background-color: #050505; 
+        color: white;
+        transition: background-color 0.5s ease;
+        overscroll-behavior-y: none; /* Prevent rubber banding on iOS */
+      }
+
+      html:not(.dark) body {
+        background-color: #f3f4f6;
+        color: #1f2937;
+      }
+      
+      /* VisionOS Mesh Gradient Background */
+      .mesh-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2;
+        transition: opacity 0.5s ease;
+      }
+      
+      html.dark .mesh-bg {
+        background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.5) 0, transparent 50%), 
+                    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.5) 0, transparent 50%);
+      }
+
+      html:not(.dark) .mesh-bg {
+         background: radial-gradient(at 0% 0%, rgba(255, 255, 255, 0.8) 0, transparent 50%), 
+                    radial-gradient(at 50% 0%, rgba(200, 220, 255, 0.4) 0, transparent 50%);
+      }
+      
+      /* Blobs */
+      .mesh-blob-1, .mesh-blob-2, .mesh-blob-3 {
+        position: fixed;
+        border-radius: 50%;
+        animation: blob 20s infinite alternate;
+        z-index: -2;
+        transition: background 1s ease;
+      }
+
+      .mesh-blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); filter: blur(100px); opacity: 0.4; }
+      .mesh-blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); filter: blur(120px); opacity: 0.3; animation-direction: alternate-reverse; }
+      .mesh-blob-3 { top: 40%; left: 30%; width: 40vw; height: 40vw; background: var(--blob-3); filter: blur(90px); opacity: 0.2; }
+
+      html:not(.dark) .mesh-blob-1,
+      html:not(.dark) .mesh-blob-2,
+      html:not(.dark) .mesh-blob-3 {
+        opacity: 0.15;
+      }
+
+      /* Firefly Particles */
+      .firefly {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 4px;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.4);
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0;
+        animation: fly 10s linear infinite;
+      }
+
+      html:not(.dark) .firefly {
+        background-color: var(--theme-color);
+        box-shadow: 0 0 5px 1px rgba(0,0,0,0.1);
+        opacity: 0.6;
+      }
+
+      @keyframes fly {
+        0% { transform: translate(0, 0) scale(0); opacity: 0; }
+        10% { opacity: 0.8; }
+        90% { opacity: 0.8; }
+        100% { transform: translate(var(--move-x), var(--move-y)) scale(0); opacity: 0; }
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.4); }
+      
+      /* Glass Classes */
+      html.dark .glass-panel { background: rgba(25, 25, 35, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); }
+      html.dark .glass-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
+      
+      html:not(.dark) .glass-panel { background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(0, 0, 0, 0.05); color: #1f2937; }
+      html:not(.dark) .glass-card { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 0, 0, 0.05); color: #1f2937; }
+
+      .glass-panel, .glass-card {
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.0"
+  }
+}
+</script>
+</head>
+  <body class="text-slate-900 dark:text-slate-100 antialiased min-h-screen">
+    <div class="mesh-bg"></div>
+    <div class="mesh-blob-1"></div>
+    <div class="mesh-blob-2"></div>
+    <div class="mesh-blob-3"></div>
+    <div id="fireflies-container"></div>
+    <div id="root"></div>
+
+    <script>
+      // Generate fireflies
+      const container = document.getElementById('fireflies-container');
+      const particleCount = 20;
+
+      for (let i = 0; i < particleCount; i++) {
+        const div = document.createElement('div');
+        div.classList.add('firefly');
+        
+        // Random starting position
+        div.style.left = Math.random() * 100 + 'vw';
+        div.style.top = Math.random() * 100 + 'vh';
+        
+        // Random movement direction
+        const moveX = (Math.random() - 0.5) * 200 + 'px';
+        const moveY = (Math.random() - 1) * 200 - 50 + 'px'; // Tend upwards
+        
+        div.style.setProperty('--move-x', moveX);
+        div.style.setProperty('--move-y', moveY);
+        
+        // Random delay and duration
+        div.style.animationDelay = Math.random() * 10 + 's';
+        div.style.animationDuration = (10 + Math.random() * 10) + 's';
+        
+        container.appendChild(div);
+      }
+    </script>
+  </body>
+</html>
